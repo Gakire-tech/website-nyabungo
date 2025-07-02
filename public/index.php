@@ -93,6 +93,27 @@ require_once __DIR__ . '/includes/header.php';
         <?php echo $leChefContent; ?>
       </div>
     </section>
+    <!-- Branches (deux photos à gauche, texte à droite) -->
+    <section class="container py-5" id="branches-section">
+      <div class="section-title text-center mb-4">Nos Branches</div>
+      <div class="row g-4 align-items-center">
+        <div class="col-12 col-lg-6 mb-4 mb-lg-0 d-flex justify-content-center align-items-center">
+          <div class="row g-2 w-100">
+            <div class="col-6">
+              <img src="../assets/event.jpg" alt="Succursale Mutanga" class="rounded shadow-sm w-100 branch-img">
+            </div>
+            <div class="col-6">
+              <img src="../assets/event1.jpg" alt="Succursale Mutakura" class="rounded shadow-sm w-100 branch-img">
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="section-text text-lg-start text-center">
+            NYABUNGO Restaurant & Bar vous accueille dans ses deux établissements uniques à Bujumbura, Mutanga et Mutakura. Chaque branche offre une atmosphère distinctive et un service impeccable pour vos repas, événements et moments de détente. Découvrez l'ambiance qui vous correspond le mieux.
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- Menus du jour par branche (avec sélecteur et affichage horizontal) -->
     <section class="container py-5" id="menus-jour">
       <div class="section-title text-center mb-4">Menus du jour</div>

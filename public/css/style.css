@@ -322,7 +322,15 @@ body { font-family: 'Georgia', serif; }
       border: 2px solid transparent;
     }
     .gallery-img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-      border-color: #ffd700;
+      transform: scale(1.03);
+    }
+
+    /* Styles pour les images de la section Branches (index.php) */
+    .branch-img {
+      height: 350px; /* Taille similaire aux images d'événements */
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .branch-img:hover {
+      transform: scale(1.03);
     } 
