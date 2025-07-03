@@ -4,30 +4,28 @@ $pageTitle = "Contact & Succursales";
 
 require_once __DIR__ . '/includes/header.php';
 
-$mutangaBranchInfo = null;
-$mutakuraBranchInfo = null;
+$mutangaBranchInfo = [];
+$mutakuraBranchInfo = [];
 
 try {
-    $stmt = $pdo->prepare("SELECT id, name FROM branches WHERE name IN ('Mutanga', 'Mutakura')");
+    $pdo = getPDOConnection(); // Assurez-vous que $pdo est défini ici si ce n'est pas déjà fait par l'inclusion du header
+
+    $stmt = $pdo->prepare("SELECT * FROM branches WHERE LOWER(TRIM(name)) IN ('mutanga', 'mutakura')");
     $stmt->execute();
-    $branches = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    $branches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $mutangaBranchId = $branches['Mutanga'] ?? null;
-    $mutakuraBranchId = $branches['Mutakura'] ?? null;
-
-    if ($mutangaBranchId) {
-        $stmt = $pdo->prepare("SELECT * FROM branches WHERE id = :id");
-        $stmt->execute(['id' => $mutangaBranchId]);
-        $mutangaBranchInfo = $stmt->fetch();
-    }
-    if ($mutakuraBranchId) {
-        $stmt = $pdo->prepare("SELECT * FROM branches WHERE id = :id");
-        $stmt->execute(['id' => $mutakuraBranchId]);
-        $mutakuraBranchInfo = $stmt->fetch();
+    foreach ($branches as $branch) {
+        if (strtolower(trim($branch['name'])) === 'mutanga') {
+            $mutangaBranchInfo = $branch;
+        } elseif (strtolower(trim($branch['name'])) === 'mutakura') {
+            $mutakuraBranchInfo = $branch;
+        }
     }
 
 } catch (PDOException $e) {
     error_log("Database error for contact page: " . $e->getMessage());
+    // Les variables $mutangaBranchInfo et $mutakuraBranchInfo restent des tableaux vides,
+    // ou vous pourriez vouloir définir des messages d'erreur spécifiques pour l'interface utilisateur ici.
 }
 
 ?>
@@ -44,27 +42,27 @@ try {
             <?php echo htmlspecialchars($mutangaBranchInfo['name'] ?? 'Mutanga'); ?>
           </h2>
           <div class="mb-2">
-            <?php echo htmlspecialchars($mutangaBranchInfo['address'] ?? 'Information non disponible'); ?>
+            <?php echo htmlspecialchars((string)($mutangaBranchInfo['address'] ?? 'Information non disponible')); ?>
           </div>
         <div class="mb-2">
-            <a href="tel:<?php echo htmlspecialchars($mutangaBranchInfo['phone'] ?? ''); ?>" class="link-primary">
-              <?php echo htmlspecialchars($mutangaBranchInfo['phone'] ?? 'Information non disponible'); ?>
+            <a href="tel:<?php echo htmlspecialchars((string)($mutangaBranchInfo['phone'] ?? '')); ?>" class="link-primary">
+              <?php echo htmlspecialchars((string)($mutangaBranchInfo['phone'] ?? 'Information non disponible')); ?>
             </a>
         </div>
         <div class="mb-2">
-            <a href="mailto:<?php echo htmlspecialchars($mutangaBranchInfo['email'] ?? ''); ?>" class="link-primary">
-              <?php echo htmlspecialchars($mutangaBranchInfo['email'] ?? 'Information non disponible'); ?>
+            <a href="mailto:<?php echo htmlspecialchars((string)($mutangaBranchInfo['email'] ?? '')); ?>" class="link-primary">
+              <?php echo htmlspecialchars((string)($mutangaBranchInfo['email'] ?? 'Information non disponible')); ?>
             </a>
         </div>
-          <div class="mb-2 text-muted small">Horaires : <?php echo htmlspecialchars($mutangaBranchInfo['opening_hours'] ?? 'Information non disponible'); ?></div>
+          <div class="mb-2 text-muted small">Horaires : <?php echo htmlspecialchars((string)($mutangaBranchInfo['opening_hours'] ?? 'Information non disponible')); ?></div>
         <div class="mb-4">
-            <iframe src="<?php echo htmlspecialchars($mutangaBranchInfo['google_maps_link'] ?? 'https://www.google.com/maps?q=-3.3822,29.3644&z=15&output=embed'); ?>" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe class="location-map"  src="<?php echo htmlspecialchars($mutangaBranchInfo['google_maps_link'] ?? 'https://www.google.com/maps?q=-3.3822,29.3644&z=15&output=embed'); ?>" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
           </div>
-          <div class="row g-2">
-            <div class="col-4"><img src="/assets/mutanga1.jpg" alt="Mutanga 1" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
-            <div class="col-4"><img src="/assets/mutanga2.jpg" alt="Mutanga 2" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
-            <div class="col-4"><img src="/assets/mutanga3.jpg" alt="Mutanga 3" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
-        </div>
+          <!-- <div class="row g-2">
+            <div class="col-4"><img src="../assets/mutanga1.jpg" alt="Mutanga 1" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
+            <div class="col-4"><img src="../assets/mutanga2.jpg" alt="Mutanga 2" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
+            <div class="col-4"><img src="../assets/mutanga3.jpg" alt="Mutanga 3" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
+        </div> -->
         </div>
       </div>
       <!-- Succursale Mutakura -->
@@ -74,27 +72,27 @@ try {
             <?php echo htmlspecialchars($mutakuraBranchInfo['name'] ?? 'Mutakura'); ?>
           </h2>
           <div class="mb-2">
-            <?php echo htmlspecialchars($mutakuraBranchInfo['address'] ?? 'Information non disponible'); ?>
+            <?php echo htmlspecialchars((string)($mutakuraBranchInfo['address'] ?? 'Information non disponible')); ?>
           </div>
         <div class="mb-2">
-            <a href="tel:<?php echo htmlspecialchars($mutakuraBranchInfo['phone'] ?? ''); ?>" class="link-primary">
-              <?php echo htmlspecialchars($mutakuraBranchInfo['phone'] ?? 'Information non disponible'); ?>
+            <a href="tel:<?php echo htmlspecialchars((string)($mutakuraBranchInfo['phone'] ?? '')); ?>" class="link-primary">
+              <?php echo htmlspecialchars((string)($mutakuraBranchInfo['phone'] ?? 'Information non disponible')); ?>
             </a>
         </div>
         <div class="mb-2">
-            <a href="mailto:<?php echo htmlspecialchars($mutakuraBranchInfo['email'] ?? ''); ?>" class="link-primary">
-              <?php echo htmlspecialchars($mutakuraBranchInfo['email'] ?? 'Information non disponible'); ?>
+            <a href="mailto:<?php echo htmlspecialchars((string)($mutakuraBranchInfo['email'] ?? '')); ?>" class="link-primary">
+              <?php echo htmlspecialchars((string)($mutakuraBranchInfo['email'] ?? 'Information non disponible')); ?>
             </a>
         </div>
-          <div class="mb-2 text-muted small">Horaires : <?php echo htmlspecialchars($mutakuraBranchInfo['opening_hours'] ?? 'Information non disponible'); ?></div>
+          <div class="mb-2 text-muted small">Horaires : <?php echo htmlspecialchars((string)($mutakuraBranchInfo['opening_hours'] ?? 'Information non disponible')); ?></div>
         <div class="mb-4">
-            <iframe src="<?php echo htmlspecialchars($mutakuraBranchInfo['google_maps_link'] ?? 'https://www.google.com/maps?q=-3.3800,29.3700&z=15&output=embed'); ?>" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe class="location-map"  src="<?php echo htmlspecialchars($mutakuraBranchInfo['google_maps_link'] ?? 'https://www.google.com/maps?q=-3.3822,29.3644&z=15&output=embed'); ?>" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
           </div>
-          <div class="row g-2">
-            <div class="col-4"><img src="/assets/mutakura1.jpg" alt="Mutakura 1" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
-            <div class="col-4"><img src="/assets/mutakura2.jpg" alt="Mutakura 2" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
-            <div class="col-4"><img src="/assets/mutakura3.jpg" alt="Mutakura 3" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
-        </div>
+          <!-- <div class="row g-2">
+            <div class="col-4"><img src="../assets/mutakura1.jpg" alt="Mutakura 1" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
+            <div class="col-4"><img src="../assets/mutakura2.jpg" alt="Mutakura 2" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
+            <div class="col-4"><img src="../assets/mutakura3.jpg" alt="Mutakura 3" class="rounded object-fit-cover w-100" style="height: 80px;"></div>
+        </div> -->
         </div>
       </div>
     </div>
@@ -125,10 +123,10 @@ try {
       <a href="https://wa.me/25761234567" target="_blank" aria-label="WhatsApp" class="text-decoration-none text-success fs-3"><i class="bi bi-whatsapp"></i></a>
     </div>
     <!-- Plan d'accès global -->
-    <div class="bg-white rounded shadow-sm p-4 mx-auto mb-5" style="max-width: 700px;">
+    <!-- <div class="bg-white rounded shadow-sm p-4 mx-auto mb-5" style="max-width: 700px;">
       <h2 class="h5 fw-bold mb-4">Plan d'accès général</h2>
       <iframe src="https://www.google.com/maps/d/embed?mid=1vQw8Qw8Qw8Qw8Qw8Qw8Qw8Qw8Qw8Qw8Qw8&hl=fr" width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-    </div>
+    </div> -->
   </main>
 <?php
 require_once __DIR__ . '/includes/footer.php';

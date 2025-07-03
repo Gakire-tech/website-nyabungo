@@ -622,7 +622,30 @@ if ($method === 'DELETE' && $segments[0] === 'site_content' && isset($segments[1
     exit;
 }
 
-// POST /api/contact (formulaire de contact)
+// GET /api/site_content/{key_name}
+if ($method === 'GET' && $segments[0] === 'site_content' && isset($segments[1])) {
+    $keyName = $segments[1];
+    try {
+        $pdo = getPDOConnection();
+        $stmt = $pdo->prepare('SELECT content_value FROM site_content WHERE key_name = ?');
+        $stmt->execute([$keyName]);
+        $content = $stmt->fetchColumn();
+
+        if ($content) {
+            echo json_encode(['status' => 'ok', 'data' => ['content' => $content]]);
+        } else {
+            http_response_code(404);
+            echo json_encode(['status' => 'error', 'message' => 'Contenu non trouvé']);
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// --- CONTACT FORM SUBMISSION ---
+// POST /api/contact (soumettre le formulaire de contact)
 if ($method === 'POST' && $segments[0] === 'contact') {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!isset($input['name'], $input['email'], $input['message'])) {
@@ -630,17 +653,31 @@ if ($method === 'POST' && $segments[0] === 'contact') {
         echo json_encode(['status' => 'error', 'message' => 'Champs requis manquants']);
         exit;
     }
-    $to = 'contact@nyabungo.com';
-    $subject = 'Nouveau message via le formulaire de contact';
-    $message = "Nom : " . $input['name'] . "\n" .
-               "Email : " . $input['email'] . "\n" .
-               "Message :\n" . $input['message'];
-    $headers = "From: " . $input['email'] . "\r\nContent-Type: text/plain; charset=utf-8";
-    if (@mail($to, $subject, $message, $headers)) {
-        echo json_encode(['status' => 'ok']);
-    } else {
+    try {
+        $pdo = getPDOConnection();
+        // Ici, vous inséreriez le message dans une table 'messages' ou 'contact_inquiries'
+        // Pour l'instant, nous allons juste simuler un envoi réussi et loguer.
+        // Note: Pour une vraie application, implémentez un envoi d'email ou un stockage DB.
+
+        // Exemple: Insérer dans une table 'contact_messages'
+        $stmt = $pdo->prepare('INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)');
+        $stmt->execute([$input['name'], $input['email'], $input['message']]);
+
+        // Envoi d'e-mail (décommenter et configurer pour un vrai serveur)
+        /*
+        $to = 'contact@nyabungo.com';
+        $subject = 'Nouveau message de contact de ' . $input['name'];
+        $message = "Nom: " . $input['name'] . "\n"
+                 . "Email: " . $input['email'] . "\n"
+                 . "Message:\n" . $input['message'];
+        $headers = 'From: noreply@yourdomain.com\r\nReply-To: ' . $input['email'] . '\r\nContent-Type: text/plain; charset=utf-8';
+        @mail($to, $subject, $message, $headers);
+        */
+
+        echo json_encode(['status' => 'ok', 'message' => 'Message envoyé avec succès.']);
+    } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Erreur lors de l\'envoi de l\'e-mail.']);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
     exit;
 }

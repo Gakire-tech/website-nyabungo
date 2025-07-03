@@ -116,14 +116,18 @@ CREATE TABLE testimonials (
 );
 
 -- Table du contenu du site (pages dynamiques) améliorée
-DROP TABLE IF EXISTS site_content;
-CREATE TABLE site_content (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    page VARCHAR(50) NOT NULL,           -- ex: 'accueil', 'contact', 'footer'
-    block VARCHAR(50) DEFAULT NULL,      -- ex: 'intro', 'section1', 'footer-main' (pour plusieurs blocs par page)
-    title VARCHAR(255) DEFAULT NULL,     -- Titre du bloc de contenu (optionnel)
-    content TEXT NOT NULL,               -- Contenu HTML ou texte
-    status ENUM('published','draft') DEFAULT 'published', -- Statut de publication
-    display_order INT DEFAULT 0,         -- Ordre d'affichage si plusieurs blocs
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS `site_content` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `key_name` VARCHAR(255) NOT NULL UNIQUE,
+    `content_value` TEXT NOT NULL,
+    `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table pour les messages de contact
+CREATE TABLE IF NOT EXISTS `contact_messages` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `message` TEXT NOT NULL,
+    `submission_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 

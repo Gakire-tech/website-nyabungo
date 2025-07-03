@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
               });
               imagesHtml += '</div>';
-            } else {
+      } else {
               imagesHtml = '<p class="text-center col-12">Aucune image disponible pour cette sélection.</p>';
             }
             eventGallery.innerHTML = imagesHtml;
@@ -338,4 +338,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-</script> 
+</script>

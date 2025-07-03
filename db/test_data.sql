@@ -66,4 +66,13 @@ INSERT INTO site_content (page, block, title, content, status, display_order) VA
 ('contact', 'intro', 'Contactez-nous', '<p>Pour toute question ou réservation, contactez-nous via ce formulaire ou par téléphone.</p>', 'published', 1),
 ('footer', 'main', NULL, '&copy; 2025 NYABUNGO RESTAURANT & BAR - Tous droits réservés', 'published', 1),
 ('a-propos', 'histoire', 'Notre histoire', '<p>Fondé en 2022, NYABUNGO RESTAURANT & BAR est né de la passion pour la gastronomie et le raffinement.</p>', 'published', 1),
-('a-propos', 'equipe', 'Notre équipe', '<p>Une équipe passionnée, engagée à faire de chaque visite un souvenir mémorable.</p>', 'published', 2); 
+('a-propos', 'equipe', 'Notre équipe', '<p>Une équipe passionnée, engagée à faire de chaque visite un souvenir mémorable.</p>', 'published', 2);
+
+-- Données de test pour la table `site_content`
+INSERT INTO `site_content` (`key_name`, `content_value`) VALUES
+('contact', '<h3>Bienvenue sur notre page de contact !</h3><p>N\'hésitez pas à nous contacter pour toute question, suggestion ou réservation. Notre équipe est disponible pour vous assister.</p><p><strong>Heures d\'ouverture:</strong> Lundi - Dimanche: 10:00 - 22:00</p>');
+
+-- Données de test pour la table `contact_messages` (si nécessaire pour le développement)
+INSERT INTO `contact_messages` (`name`, `email`, `message`) VALUES
+('Jean Dupont', 'jean.dupont@example.com', 'Ceci est un message de test.'),
+('Alice Smith', 'alice.smith@example.com', 'Demande d\'information sur les réservations.'); 

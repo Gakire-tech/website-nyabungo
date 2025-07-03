@@ -7,20 +7,30 @@ if (isset($_SESSION['admin_id'])) {
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   require_once __DIR__ . '/../config/database.php';
-  $username = $_POST['username'] ?? '';
+  $username = trim(strtolower($_POST['username'] ?? ''));
   $password = $_POST['password'] ?? '';
   $pdo = getPDOConnection();
-  $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ? AND is_active = 1');
+  // Recherche insensible à la casse et aux espaces
+  $stmt = $pdo->prepare('SELECT * FROM users WHERE LOWER(TRIM(username)) = ? LIMIT 1');
   $stmt->execute([$username]);
   $user = $stmt->fetch();
-  if ($user && password_verify($password, $user['password_hash'])) {
-    $_SESSION['admin_id'] = $user['id'];
-    $_SESSION['admin_username'] = $user['username'];
-    $_SESSION['admin_role'] = $user['role'];
-    header('Location: dashboard.php');
-    exit;
+  if ($user) {
+    if (!$user['is_active']) {
+      $error = 'Compte inactif. Contactez l\'administrateur.';
+      error_log('Tentative de connexion sur compte inactif : ' . $username);
+    } elseif (password_verify($password, $user['password_hash'])) {
+      $_SESSION['admin_id'] = $user['id'];
+      $_SESSION['admin_username'] = $user['username'];
+      $_SESSION['admin_role'] = $user['role'];
+      header('Location: dashboard.php');
+      exit;
+    } else {
+      $error = 'Mot de passe incorrect.';
+      error_log('Mot de passe incorrect pour : ' . $username);
+    }
   } else {
-    $error = 'Identifiants invalides ou compte inactif.';
+    $error = 'Utilisateur non trouvé.';
+    error_log('Utilisateur non trouvé : ' . $username);
   }
 }
 ?>
