@@ -3,11 +3,13 @@
 // Cette partie sera incluse dans toutes les pages publiques
 ?>
   <footer class="footer text-center mt-5">
-    <img src="../assets/logo.jpg" alt="NYABUNGO Logo" class="footer-logo-img mb-3">
+    <img src="../assets/NYABUUNGO.png" alt="NYABUNGO Logo" class="footer-logo-img mb-3">
     <div class="footer-socials">
       <a href="https://facebook.com/nyabungo" target="_blank"><i class="bi bi-facebook"></i></a>
       <a href="https://instagram.com/nyabungo" target="_blank"><i class="bi bi-instagram"></i></a>
       <a href="https://wa.me/25761234567" target="_blank"><i class="bi bi-whatsapp"></i></a>
+      <a href="https://x.com/nyabungo" target="_blank" ><i class="bi bi-twitter-x"></i></a>
+      <a href="https://youtube.com/@nyabungo" target="_blank" ><i class="bi bi-youtube"></i></a>
     </div>
     <div class="footer-copyright">&copy; 2025 NYABUNGO RESTAURANT & BAR</div>
   </footer>

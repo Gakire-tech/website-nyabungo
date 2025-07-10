@@ -88,7 +88,7 @@ require_once __DIR__ . '/includes/header.php';
     <!-- Le chef -->
     <section class="container py-5 text-center">
       <div class="section-title">Le chef</div>
-      <img src="../assets/chef.jpg" alt="Chef Jean-Claude" class="chef-img mb-3">
+      <img src="../assets/logo1.PNG" alt="Chef Jean-Claude" class="chef-img mb-3">
       <div class="section-text">
         <?php echo $leChefContent; ?>
       </div>
@@ -171,7 +171,7 @@ require_once __DIR__ . '/includes/header.php';
     <section class="container py-5" id="evenement">
       <div class="row align-items-center g-3 g-lg-2">
         <div class="col-12 col-lg-6 mb-4 mb-lg-0 d-flex justify-content-center">
-          <div style="width:100%; max-width:480px; height:380px; border-radius:1.2rem; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.10);">
+          <div style="width:100%; max-width:800px; height:380px; border-radius:1.2rem; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.10);">
             <img src="../assets/event1.jpg" alt="Événementiel Nyabungo" style="width:100%; height:100%; object-fit:cover; display:block;">
           </div>
         </div>

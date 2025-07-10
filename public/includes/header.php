@@ -34,7 +34,7 @@ $pdo = getPDOConnection();
       </div>
       <!-- Logo centre -->
       <div class="navbar-section center">
-        <a class="navbar-logo mx-auto" href="index.php"><img src="../assets/logo.jpg" alt="NYABUNGO Logo" class="navbar-logo-img"></a>
+        <a class="navbar-logo mx-auto" href="index.php"><img src="../assets/NYABUUNGO.png" alt="NYABUNGO Logo" class="navbar-logo-img"></a>
       </div>
       <!-- Menu droit -->
       <div class="navbar-section right">
