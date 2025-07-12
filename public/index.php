@@ -22,14 +22,13 @@ try {
         $selectedBranchId = $branches[0]['id'];
     }
 
-    // Récupérer les items de menu pour la branche sélectionnée, limités à 4
+    // Récupérer les menus pour la branche sélectionnée (image, name, description)
     if ($selectedBranchId) {
         $stmt = $pdo->prepare("
-            SELECT mi.image, mi.name, mi.description, mi.price
-            FROM menu_items mi
-            JOIN menus m ON mi.menu_id = m.id
-            WHERE m.branch_id = :branch_id AND mi.is_available = TRUE
-            ORDER BY mi.id
+            SELECT image, name, description
+            FROM menus
+            WHERE branch_id = :branch_id AND is_active = TRUE
+            ORDER BY id
             LIMIT 4
         ");
         $stmt->execute(['branch_id' => $selectedBranchId]);
@@ -60,10 +59,17 @@ try {
     $notreHistoireContent = $pageContents['histoire'] ?? $notreHistoireContent;
     $leChefContent = $pageContents['chef'] ?? $leChefContent;
 
+    // Récupérer les événements (images et textes) pour la branche id=1
+    $evenementImages = [];
+    $stmt = $pdo->prepare("SELECT image_path, alt_text FROM event_images WHERE branch_id = 1 ORDER BY display_order ASC, id ASC");
+    $stmt->execute();
+    $evenementImages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
     $currentMenus = [];
     $branches = [];
+    $evenementImages = [];
 }
 
 $pageTitle = "Accueil";
@@ -96,21 +102,18 @@ require_once __DIR__ . '/includes/header.php';
     <!-- Branches (deux photos à gauche, texte à droite) -->
     <section class="container py-5" id="branches-section">
       <div class="section-title text-center mb-4">Nos Branches</div>
-      <div class="row g-4 align-items-center">
-        <div class="col-12 col-lg-6 mb-4 mb-lg-0 d-flex justify-content-center align-items-center">
-          <div class="row g-2 w-100">
-            <div class="col-6">
-              <img src="../assets/event.jpg" alt="Succursale Mutanga" class="rounded shadow-sm w-100 branch-img">
-            </div>
-            <div class="col-6">
-              <img src="../assets/event1.jpg" alt="Succursale Mutakura" class="rounded shadow-sm w-100 branch-img">
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-lg-6">
-          <div class="section-text text-lg-start text-center">
-            NYABUNGO Restaurant & Bar vous accueille dans ses deux établissements uniques à Bujumbura, Mutanga et Mutakura. Chaque branche offre une atmosphère distinctive et un service impeccable pour vos repas, événements et moments de détente. Découvrez l'ambiance qui vous correspond le mieux.
-          </div>
+      <div class="mb-4 d-flex justify-content-center" id="branches-filter"></div>
+      <div id="branchesCarouselWrapper">
+        <div id="branchesCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner" id="branches-carousel-inner"></div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#branchesCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Précédent</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#branchesCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Suivant</span>
+          </button>
         </div>
       </div>
     </section>
@@ -137,12 +140,11 @@ require_once __DIR__ . '/includes/header.php';
       <!-- Affichage des menus horizontalement -->
       <div class="menu-gallery-scroll" id="menu-gallery-display">
         <?php if (!empty($currentMenus)): ?>
-          <?php foreach ($currentMenus as $menuItem): ?>
+          <?php foreach ($currentMenus as $menu): ?>
             <div class="menu-item-card d-flex flex-column align-items-center text-center p-2">
-                <img src="../assets/uploads/<?php echo htmlspecialchars($menuItem['image']); ?>" alt="<?php echo htmlspecialchars($menuItem['name']); ?>" class="rounded shadow-sm menu-item-img">
-                <h5 class="mt-3 mb-1 fw-bold"><?php echo htmlspecialchars($menuItem['name']); ?></h5>
-                <p class="text-muted mb-1 small"><?php echo htmlspecialchars($menuItem['description']); ?></p>
-                <p class="fw-bold text-gold"><?php echo htmlspecialchars(number_format($menuItem['price'], 0, ',', ' ')); ?> FBU</p>
+                <img src="../assets/uploads/<?php echo htmlspecialchars($menu['image']); ?>" alt="<?php echo htmlspecialchars($menu['name']); ?>" class="rounded shadow-sm menu-item-img">
+                <h5 class="mt-3 mb-1 fw-bold"><?php echo htmlspecialchars($menu['name']); ?></h5>
+                <p class="text-muted mb-1 small"><?php echo htmlspecialchars($menu['description']); ?></p>
             </div>
           <?php endforeach; ?>
         <?php else: ?>
@@ -150,22 +152,43 @@ require_once __DIR__ . '/includes/header.php';
         <?php endif; ?>
       </div>
     </section>
-    <!-- Événementiel (texte à gauche, photo à droite) -->
+    <!-- Événementiel (carrousel dynamique) -->
     <section class="container py-5" id="evenement2">
-      <div class="row align-items-center g-3 g-lg-2 flex-lg-row flex-column-reverse">
-        <div class="col-12 col-lg-6">
-          <div class="section-title text-lg-start text-center">Événementiel</div>
-          <div class="section-text text-lg-start text-center">
-            Découvrez nos soirées à thème, concerts live et événements exclusifs organisés tout au long de l'année chez NYABUNGO.<br><br>
-            Profitez d'une ambiance unique et festive, idéale pour partager des moments inoubliables entre amis ou en famille.
+      <div class="section-title text-center mb-4">Événementiel</div>
+      <?php if (!empty($evenementImages)): ?>
+        <div id="evenementCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <?php foreach ($evenementImages as $idx => $img): ?>
+              <div class="carousel-item<?php if ($idx === 0) echo ' active'; ?>">
+                <div class="card shadow-sm border-0" style="border-radius:1.2rem;">
+                  <div class="row align-items-center g-2 flex-lg-row flex-column-reverse p-3">
+                    <div class="col-12 col-lg-6">
+                      <div class="section-text text-lg-start text-center" style="font-size:1rem; padding:0.5rem 0;">
+                        <?php echo htmlspecialchars($img['alt_text'] ?: ''); ?>
+                      </div>
+                    </div>
+                    <div class="col-12 col-lg-6 mb-3 mb-lg-0 d-flex justify-content-center">
+                      <div style="width:100%; max-width:320px; height:220px; border-radius:1rem; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.10);">
+                        <img src="../assets/<?php echo htmlspecialchars($img['image_path']); ?>" alt="<?php echo htmlspecialchars($img['alt_text']); ?>" style="width:100%; height:100%; object-fit:cover; display:block;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
           </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#evenementCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Précédent</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#evenementCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Suivant</span>
+          </button>
         </div>
-        <div class="col-12 col-lg-6 mb-4 mb-lg-0 d-flex justify-content-center">
-          <div style="width:100%; max-width:480px; height:380px; border-radius:1.2rem; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.10);">
-            <img src="../assets/event2.jpeg" alt="Événementiel spécial Nyabungo" style="width:100%; height:100%; object-fit:cover; display:block;">
-          </div>
-        </div>
-      </div>
+      <?php else: ?>
+        <div class="text-center">Aucun événement à afficher pour le moment.</div>
+      <?php endif; ?>
     </section>
     <!-- Événementiel (en deux colonnes) -->
     <section class="container py-5" id="evenement">
@@ -338,4 +361,121 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+let branchAutoScrollInterval;
+
+async function loadBranchesCarousel(branchName = '') {
+  const url = branchName ? `../api/get_branches.php?branch=${encodeURIComponent(branchName)}` : '../api/get_branches.php';
+  const res = await fetch(url);
+  const data = await res.json();
+  const carouselInner = document.getElementById('branches-carousel-inner');
+  carouselInner.innerHTML = '';
+  if (!data.branches.length) {
+    carouselInner.innerHTML = '<div class="text-center w-100 py-4">Aucune branche trouvée.</div>';
+    return;
+  }
+  // Générer les cards par paires (2 par slide)
+  let cards = [];
+  data.branches.forEach(branch => {
+    branch.images.forEach(img => {
+      cards.push({
+        name: branch.name,
+        image: img.image,
+        caption: img.caption || ''
+      });
+    });
+  });
+  for (let i = 0; i < cards.length; i += 2) {
+    const active = i === 0 ? 'active' : '';
+    const card1 = cards[i];
+    const card2 = cards[i+1];
+    carouselInner.innerHTML += `
+      <div class="carousel-item ${active}">
+        <div class="d-flex justify-content-center align-items-stretch gap-4">
+          <div class="card branch-card flex-row align-items-stretch" style="min-width:480px; max-width:540px; height:260px;">
+            <div class="branch-card-img-wrap d-flex align-items-center justify-content-center" style="flex:0 0 200px; height:100%;">
+              <img src="../assets/${card1.image}" class="branch-card-img" alt="${card1.name}" style="width:180px; height:180px; object-fit:cover; border-radius:1rem;">
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="flex:1 1 0;">
+              <h5 class="card-title mb-2">${card1.name}</h5>
+              <p class="card-text">${card1.caption}</p>
+            </div>
+          </div>
+          ${card2 ? `
+          <div class="card branch-card flex-row align-items-stretch" style="min-width:480px; max-width:540px; height:260px;">
+            <div class="branch-card-img-wrap d-flex align-items-center justify-content-center" style="flex:0 0 200px; height:100%;">
+              <img src="../assets/${card2.image}" class="branch-card-img" alt="${card2.name}" style="width:180px; height:180px; object-fit:cover; border-radius:1rem;">
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center" style="flex:1 1 0;">
+              <h5 class="card-title mb-2">${card2.name}</h5>
+              <p class="card-text">${card2.caption}</p>
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Générer le filtre de branches
+async function renderBranchFilter() {
+  const res = await fetch('../api/get_branches.php');
+  const data = await res.json();
+  const filterDiv = document.getElementById('branches-filter');
+  if (!data.branches.length) return;
+  filterDiv.innerHTML = '';
+  data.branches.forEach(branch => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline-dark mx-1';
+    btn.textContent = branch.name;
+    btn.onclick = () => loadBranchesCarousel(branch.name);
+    filterDiv.appendChild(btn);
+  });
+  // Bouton pour tout afficher
+  const allBtn = document.createElement('button');
+  allBtn.className = 'btn btn-dark mx-1';
+  allBtn.textContent = 'Toutes';
+  allBtn.onclick = () => loadBranchesCarousel('');
+  filterDiv.prepend(allBtn);
+}
+
+renderBranchFilter();
+loadBranchesCarousel();
 </script>
+
+<style>
+#branchesCarouselWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+#branchesCarousel .carousel-inner {
+  width: 100%;
+}
+.branch-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  border: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+  min-width: 600px;
+  max-width: 700px;
+  height: 260px;
+}
+.branch-card:hover {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+}
+.branch-card-img-wrap {
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+.branch-card-img {
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+@media (max-width: 991.98px) {
+  .branch-card { min-width: 98vw; max-width: 99vw; height: 180px; }
+  .branch-card-img-wrap { flex:0 0 90px; }
+  .branch-card-img { width: 80px; height: 80px; }
+  #branchesCarouselWrapper { max-width: 100vw; }
+}
+</style>

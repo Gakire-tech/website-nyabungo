@@ -7,6 +7,7 @@
     <div class="footer-socials">
       <a href="https://facebook.com/nyabungo" target="_blank"><i class="bi bi-facebook"></i></a>
       <a href="https://instagram.com/nyabungo" target="_blank"><i class="bi bi-instagram"></i></a>
+      <a href="https://twitter.com/nyabungo" target="_blank"><i class="bi bi-twitter"></i></a>
       <a href="https://wa.me/25761234567" target="_blank"><i class="bi bi-whatsapp"></i></a>
     </div>
     <div class="footer-copyright">&copy; 2025 NYABUNGO RESTAURANT & BAR</div>

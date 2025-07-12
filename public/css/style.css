@@ -52,10 +52,10 @@ body { font-family: 'Georgia', serif; }
       /* transition: color 0.3s; */
     }
     .navbar-logo-img {
-      max-height: 120px; /* Taille augmentée */
+      max-height: 70px;
       width: auto;
       display: block;
-      margin: 0 auto; /* Centrer l'image horizontalement */
+      margin: 0 auto;
     }
     .navbar-custom.scrolled .navbar-logo {
       color: #b08d57;
@@ -333,4 +333,23 @@ body { font-family: 'Georgia', serif; }
     }
     .branch-img:hover {
       transform: scale(1.03);
+    }
+
+    .menu-nav .nav-item {
+      margin-right: 0px;
+    }
+    .menu-nav .nav-item:last-child {
+      margin-right: 0;
+    }
+    .menu-nav .nav-link {
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+    .navbar-custom .container-fluid {
+      gap: 96px;
+    }
+    @media (max-width: 991.98px) {
+      .navbar-custom .container-fluid {
+        gap: 40px;
+      }
     } 

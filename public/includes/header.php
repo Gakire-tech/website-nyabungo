@@ -3,6 +3,15 @@
 // Cette partie sera incluse dans toutes les pages publiques
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/lang.php';
+
+session_start();
+// Gestion de la langue
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['fr', 'en'])) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+$lang = $_SESSION['lang'] ?? 'fr';
+$text = $langs[$lang];
 
 $pdo = getPDOConnection();
 
@@ -26,10 +35,10 @@ $pdo = getPDOConnection();
     <div class="container-fluid px-lg-5 px-2 d-flex align-items-center" style="min-height:90px;">
       <!-- Menu gauche -->
       <div class="navbar-section">
-        <ul class="navbar-nav flex-row">
-          <li class="nav-item"><a class="nav-link" href="a-propos.php">À propos</a></li>
-          <li class="nav-item"><a class="nav-link" href="evenements.php">Événementiel</a></li>
-          <li class="nav-item"><a class="nav-link" href="galeries.php">Galerie</a></li>
+        <ul class="navbar-nav flex-row menu-nav">
+          <li class="nav-item"><a class="nav-link" href="index.php"><?= htmlspecialchars($text['home']) ?></a></li>
+          <li class="nav-item"><a class="nav-link" href="evenements.php"><?= htmlspecialchars($text['events']) ?></a></li>
+          <li class="nav-item"><a class="nav-link" href="galeries.php"><?= htmlspecialchars($text['gallery']) ?></a></li>
         </ul>
       </div>
       <!-- Logo centre -->
@@ -38,15 +47,16 @@ $pdo = getPDOConnection();
       </div>
       <!-- Menu droit -->
       <div class="navbar-section right">
-        <ul class="navbar-nav flex-row align-items-center">
+        <ul class="navbar-nav flex-row align-items-center menu-nav">
+          <li class="nav-item"><a class="nav-link" href="a-propos.php"><?= htmlspecialchars($text['about']) ?></a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.php"><?= htmlspecialchars($text['contact']) ?></a></li>
           <li class="nav-item dropdown lang-dropdown">
-          <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
             <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              FR
+              <?= htmlspecialchars($text['lang']) ?>
             </a>
             <ul class="dropdown-menu" aria-labelledby="langDropdown">
-              <li><a class="dropdown-item active" href="#">FR</a></li>
-              <li><a class="dropdown-item" href="#">EN</a></li>
+              <li><a class="dropdown-item<?= $lang === 'fr' ? ' active' : '' ?>" href="?lang=fr">FR</a></li>
+              <li><a class="dropdown-item<?= $lang === 'en' ? ' active' : '' ?>" href="?lang=en">EN</a></li>
             </ul>
           </li>
         </ul>
