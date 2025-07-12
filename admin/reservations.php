@@ -23,7 +23,7 @@ if (!isset($_SESSION['admin_id'])) {
     <div class="mb-4 d-flex gap-3">
       <select id="branch-filter" class="form-select w-auto">
         <option value="1">Mutanga</option>
-        <option value="2">Mutakura</option>
+        <option value="2">Kinama</option>
       </select>
       <input type="date" id="date-filter" class="form-control w-auto">
     </div>
